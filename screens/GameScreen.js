@@ -1,4 +1,4 @@
-import {Text, View, StyleSheet, Alert, FlatList} from "react-native";
+import {Text, View, StyleSheet, Alert, FlatList, useWindowDimensions} from "react-native";
 import Title from "../components/ui/Title";
 import {useEffect, useState} from "react";
 import NumberContainer from "../components/game/NumberContainer";
@@ -29,6 +29,7 @@ export default function GameScreen({userNumber, onGameOver}) {
     const initialGuess = generateRandomBetween(1, 100, userNumber, [])
     const [currentGuess, setCurrentGuess] = useState(initialGuess)
     const [guessRounds, setGuessRounds] = useState([initialGuess])
+    const {width, height} = useWindowDimensions()
 
     useEffect(() => {
         if (currentGuess === userNumber) {
@@ -62,8 +63,7 @@ export default function GameScreen({userNumber, onGameOver}) {
         setGuessRounds(prevGuessRounds => [newRandomNumber, ...prevGuessRounds])
     }
 
-    return <View style={style.screen}>
-        <Title>Opponent's Guess</Title>
+    let content = <>
         <NumberContainer>{currentGuess}</NumberContainer>
         <Card>
             <InstructionText style={style.subtitle}>Higher or Lower</InstructionText>
@@ -80,6 +80,30 @@ export default function GameScreen({userNumber, onGameOver}) {
                 </View>
             </View>
         </Card>
+    </>
+
+    if (width > 500) {
+        content = <>
+            <View style={style.buttons}>
+                <View style={style.button}>
+                    <PrimaryButton onPress={() => nextGuessHandler('lower')}>
+                        <AntDesign name="minus" size={16} color={Colors.white}/>
+                    </PrimaryButton>
+                </View>
+                <NumberContainer>{currentGuess}</NumberContainer>
+                <View style={style.button}>
+                    <PrimaryButton onPress={() => nextGuessHandler('higher')}>
+                        <AntDesign name="plus" size={16} color={Colors.white}/>
+                    </PrimaryButton>
+                </View>
+
+            </View>
+        </>
+    }
+
+    return <View style={style.screen}>
+        <Title>Opponent's Guess</Title>
+        {content}
         <View style={style.list}>
             <FlatList data={guessRounds}
                       renderItem={({item, index}) => <GuessLogItem guess={item}
