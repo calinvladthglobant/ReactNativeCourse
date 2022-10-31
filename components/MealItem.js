@@ -1,19 +1,25 @@
 import {Image, Pressable, Text, View, StyleSheet} from "react-native";
+import {useNavigation} from "@react-navigation/native";
+import MealDetails from "./MealDetails";
 
 export default function MealItem({data}) {
-    const {title, imageUrl, duration, complexity, affordability} = data
+    const {id, title, imageUrl, duration, complexity, affordability} = data
+    const navigation = useNavigation()
+
+    function pressHandler() {
+         navigation.navigate('MealDetails', {
+            mealId: id
+        })
+    }
+
     return <View style={style.box}>
-        <Pressable style={({pressed}) => pressed && style.boxPressed}>
+        <Pressable style={({pressed}) => pressed && style.boxPressed} onPress={pressHandler}>
             <View style={style.innerBox}>
                 <View>
                     <Image style={style.image} source={{uri: imageUrl}}/>
                     <Text style={style.title}>{title}</Text>
                 </View>
-                <View style={style.details}>
-                    <Text style={style.detailsItem}>{duration}m</Text>
-                    <Text style={style.detailsItem}>{complexity.toUpperCase()}</Text>
-                    <Text style={style.detailsItem}>{affordability.toUpperCase()}</Text>
-                </View>
+                <MealDetails affordability={affordability} complexity={complexity} duration={duration}/>
             </View>
         </Pressable>
 
@@ -47,15 +53,5 @@ const style = StyleSheet.create({
         fontWeight: "bold",
         textAlign: "center",
         margin: 8
-    },
-    details: {
-        flexDirection: "row",
-        justifyContent: "center",
-        alignItems: "center",
-        padding: 8
-    },
-    detailsItem: {
-        marginHorizontal: 8,
-        fontSize: 12
     }
 })
