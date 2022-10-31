@@ -1,6 +1,12 @@
 import {StyleSheet, Text, View} from 'react-native';
 import {useFonts} from "expo-font";
 import {StatusBar} from "expo-status-bar";
+import CategoriesScreen from "./screens/CategoriesScreen";
+import {NavigationContainer} from "@react-navigation/native";
+import MealsOverviewScreen from "./screens/MealsOverviewScreen";
+import {createNativeStackNavigator} from "@react-navigation/native-stack";
+
+const Stack = createNativeStackNavigator()
 
 export default function App() {
     const [fontsLoaded] = useFonts({
@@ -13,17 +19,12 @@ export default function App() {
     }
 
     return <>
-        <StatusBar style="light"/>
-        <View style={style.container}>
-            <Text>Hola!</Text>
-        </View>
+        <StatusBar style={"dark"}/>
+        <NavigationContainer>
+            <Stack.Navigator initialRouteName={"MealsCategories"}>
+                <Stack.Screen name={"MealsCategories"} component={CategoriesScreen}/>
+                <Stack.Screen name={"MealsOverview"} component={MealsOverviewScreen}/>
+            </Stack.Navigator>
+        </NavigationContainer>
     </>
 }
-
-const style = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center'
-    }
-});
