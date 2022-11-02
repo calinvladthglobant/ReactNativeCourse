@@ -3,17 +3,23 @@ import {MEALS} from "../data/fakeData";
 import MealDetails from "../components/MealDetails";
 import Subtitle from "../components/MealDetail/Subtitle";
 import List from "../components/MealDetail/List";
-import {useLayoutEffect, useState} from "react";
+import {useContext, useLayoutEffect, useState} from "react";
 import IconButton from "../components/IconButton";
+import {FavoritesContext} from "../store/context/favorites";
 
 export default function MealDetailsScreen({route, navigation}) {
     const id = route.params.mealId
     const meal = MEALS.find(o => o.id === id)
     const {title, ingredients, steps, imageUrl, affordability, complexity, duration} = meal
-    const [favorite, setFavorite] = useState(false)
+
+    const favoriteMealsCtx = useContext(FavoritesContext)
+    const favorite = favoriteMealsCtx.ids.includes(id)
 
     function headerPressedButton() {
-        setFavorite(!favorite)
+        // setFavorite(!favorite)
+        if (favorite) favoriteMealsCtx.removeFavorites(id)
+        else favoriteMealsCtx.addFavorites(id)
+
     }
 
     useLayoutEffect(() => {
