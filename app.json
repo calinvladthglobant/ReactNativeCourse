@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Section4",
-    "slug": "Section4",
+    "name": "React Native App",
+    "slug": "React Native App",
     "version": "1.0.0",
     "orientation": "default",
     "icon": "./assets/icon.png",
