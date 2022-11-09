@@ -11,38 +11,33 @@ export default function ManageExpenses({route, navigation}) {
   const expenseId = route.params?.expenseId
   const isEditing = !!expenseId
 
+  const selectedExpense = expensesCtx.expenses.find(o => o.id === expenseId)
+
   useLayoutEffect(() => {
     navigation.setOptions({
       title: isEditing ? "Edit Expense" : "Add Expense"
     })
   }, [navigation, isEditing])
 
+  function cancelHandler() {
+    navigation.goBack()
+  }
+
+  function confirmExpenseHandler(data) {
+    if (isEditing) expensesCtx.updateExpense(expenseId, {description: "TEST UPDATE"})
+    else expensesCtx.addExpense(data)
+    navigation.goBack()
+  }
+
   function deleteExpenseHandler() {
     expensesCtx.deleteExpense(expenseId)
     navigation.goBack()
   }
 
-  function cancelHandler() {
-    navigation.goBack()
-  }
-
-  function confirmExpenseHandler() {
-    if (isEditing) expensesCtx.updateExpense(expenseId, {description: "TEST UPDATE"})
-    else expensesCtx.addExpense({description: "TEST", amount: 19.99, date: new Date()})
-    navigation.goBack()
-
-  }
 
   return <View style={style.container}>
-    <ExpenseForm/>
-    <View style={style.buttonsContainer}>
-      <View style={style.buttonContainer}>
-        <Button onPress={cancelHandler}>Cancel</Button>
-      </View>
-      <View style={style.buttonContainer}>
-        <Button mode="flat" onPress={confirmExpenseHandler}>{isEditing ? "Update" : "Add"}</Button>
-      </View>
-    </View>
+    <ExpenseForm onCancel={cancelHandler} onSubmit={confirmExpenseHandler}
+                 submitButtonLabel={isEditing ? "Update" : "Add"} defaultValues={selectedExpense}/>
     {
       isEditing && <View style={style.deleteContainer}>
         <IconButton name="delete" color={GlobalStyles.colors.error500} size={30} onPress={deleteExpenseHandler}/>
@@ -55,14 +50,6 @@ const style = StyleSheet.create({
   container: {
     flex: 1,
     padding: 24
-  },
-  buttonsContainer: {
-    flexDirection: "row",
-    alignItems: "center"
-  },
-  buttonContainer: {
-    flex: 1,
-    marginHorizontal: 7
   },
   deleteContainer: {
     marginTop: 16,
