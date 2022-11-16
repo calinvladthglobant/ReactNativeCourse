@@ -1,18 +1,73 @@
-import {StyleSheet, Text, View} from 'react-native';
-import {StatusBar} from "expo-status-bar";
+import {StatusBar} from 'expo-status-bar';
 
-export default function App() {
+import LoginScreen from './screens/LoginScreen';
+import SignupScreen from './screens/SignupScreen';
+import WelcomeScreen from './screens/WelcomeScreen';
+import {Colors} from './constants/styles';
+import {createNativeStackNavigator} from "@react-navigation/native-stack";
+import {NavigationContainer} from "@react-navigation/native";
+import AuthContextProvider, {AuthContext} from "./store/auth-context";
+import {useContext} from "react";
+import IconButton from "./components/ui/IconButton";
 
-    return <View style={style.container}>
-        <StatusBar style="light"/>
-        <Text>Hola!</Text>
-    </View>
+const Stack = createNativeStackNavigator();
+
+function AuthStack() {
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerStyle: {backgroundColor: Colors.primary500},
+        headerTintColor: 'white',
+        contentStyle: {backgroundColor: Colors.primary100},
+      }}
+    >
+      <Stack.Screen name="Login" component={LoginScreen}/>
+      <Stack.Screen name="Signup" component={SignupScreen}/>
+    </Stack.Navigator>
+  );
 }
 
-const style = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center"
-    }
-});
+function AuthenticatedStack() {
+  const authCtx = useContext(AuthContext)
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerStyle: {backgroundColor: Colors.primary500},
+        headerTintColor: 'white',
+        contentStyle: {backgroundColor: Colors.primary100},
+      }}
+    >
+      <Stack.Screen name="Welcome" component={WelcomeScreen} options={{
+        headerRight: ({tintColor}) => <IconButton icon="exit" color={tintColor} size={25} onPress={authCtx.logout}/>
+      }}/>
+    </Stack.Navigator>
+  );
+}
+
+function Navigation() {
+  const authCtx = useContext(AuthContext)
+
+
+  return (
+    <NavigationContainer>
+      {
+        authCtx.isAuthenticated ?
+          <AuthenticatedStack/>
+          :
+          <AuthStack/>
+      }
+    </NavigationContainer>
+
+  );
+}
+
+export default function App() {
+  return (
+    <>
+      <StatusBar style="light"/>
+      <AuthContextProvider>
+        <Navigation/>
+      </AuthContextProvider>
+    </>
+  );
+}
