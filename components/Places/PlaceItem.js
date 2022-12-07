@@ -1,8 +1,7 @@
 import {Image, Pressable, StyleSheet, Text, View} from "react-native";
 
 export default function PlaceItem({place, onSelect}) {
-    console.log('W: ', place)
-    return <Pressable style={({pressed}) => [pressed && styles.pressed, styles.item]} onSelect={onSelect}>
+    return <Pressable style={({pressed}) => [pressed && styles.pressed, styles.item]} onPress={() => onSelect(place.id)}>
         <Image style={styles.image} source={{uri: place.image}}/>
         <View style={styles.info}>
             <Text style={styles.title}>{place.title}</Text>
