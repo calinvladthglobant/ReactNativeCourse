@@ -2,12 +2,43 @@ import {Alert, Image, StyleSheet, Text, View} from "react-native";
 import OutlinedButton from "../UI/OutlinedButton";
 import {getCurrentPositionAsync, useForegroundPermissions} from "expo-location";
 import {PermissionStatus} from "expo-image-picker";
-import {useState} from "react";
-import getMapPreview from "../../util/location";
+import {useEffect, useState} from "react";
+import {getAddress, getMapPreview} from "../../util/location";
+import {useIsFocused, useNavigation, useRoute} from "@react-navigation/native";
 
-export default function LocationPicker() {
+export default function LocationPicker({onPickLocation}) {
     const [pickedLocation, setPickedLocation] = useState()
+
+    const navigation = useNavigation()
+    const route = useRoute()
+    const isFocused = useIsFocused()
+
     const [locationPermissionInformation, requestPermission] = useForegroundPermissions()
+
+    useEffect(() => {
+        if (isFocused && route.params) {
+            const mapPickedLocation = route.params && {
+                lat: route.params.pickedLat,
+                lng: route.params.pickedLng,
+            }
+
+            if (mapPickedLocation) {
+                setPickedLocation(mapPickedLocation)
+
+            }
+        }
+    }, [route, isFocused])
+
+    useEffect(() => {
+        (async function handleLocation() {
+
+            if (pickedLocation) {
+                const address = await getAddress(pickedLocation.lat, pickedLocation.lng)
+                onPickLocation({...pickedLocation, address: address})
+            }
+
+        })()
+    }, [pickedLocation, onPickLocation])
 
     async function verifyPermission() {
         if (locationPermissionInformation.status === PermissionStatus.UNDETERMINED) {
@@ -37,6 +68,7 @@ export default function LocationPicker() {
     }
 
     function pickOnMapHandler() {
+        navigation.navigate('Map')
     }
 
     let locationPreview = <Text>No location preview</Text>
@@ -52,7 +84,7 @@ export default function LocationPicker() {
         </View>
         <View style={styles.actions}>
             <OutlinedButton icon="location" onPress={getLocationHandler}>Locate User</OutlinedButton>
-            <OutlinedButton icon="map">Pick on Map</OutlinedButton>
+            <OutlinedButton icon="map" onPress={pickOnMapHandler}>Pick on Map</OutlinedButton>
         </View>
     </View>
 }
